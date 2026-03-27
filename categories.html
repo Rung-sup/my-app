@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เลือกหมวดหมู่ - My Reader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Prompt', sans-serif; }
+        body { 
+            margin: 0; 
+            background: #1a1a1a; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        h1 { color: #d4af37; margin-bottom: 30px; font-weight: 600; text-align: center; }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .cat-card {
+            padding: 22px;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 19px;
+            font-weight: 500;
+            transition: 0.3s;
+            border: 2px solid transparent;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .cat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(212, 175, 87, 0.2); }
+
+        /* การตั้งค่าสีตามหมวดหมู่ที่คุณปุ๊กต้องการ */
+        .cat-petch { background: #2d472d; color: #d4af37; border-color: #d4af37; } 
+        .cat-thai { background: #3d2b1f; color: #e6ccb2; } 
+        .cat-translate { background: #2c3e50; color: #ecf0f1; } 
+        .cat-china { background: #800000; color: #ffd700; border-color: #ffd700; } 
+        .cat-howto { background: #ffffff; color: #333; } 
+
+    </style>
+</head>
+<body>
+
+    <h1>คลังหนังสือของคุณปุ๊ก</h1>
+
+    <div class="category-grid">
+        <div class="cat-card cat-petch" onclick="goToArchive('1zK7g-wUm_5Ld0DhKj-dD77E2lntbMjBH', 'เพชรพระอุมา', 'forest')">💎 เพชรพระอุมา</div>
+        <div class="cat-card cat-thai" onclick="goToArchive('1bdO4QDMW33p8EIxq6XXygMHgJr_G4WXi', 'นิยายไทย', 'classic')">📖 นิยายไทย</div>
+        <div class="cat-card cat-translate" onclick="goToArchive('1fOwEYKmJ8Di-H7T90dWAi7O0KwSlkKjq', 'นิยายแปล', 'classic')">🌐 นิยายแปล</div>
+        <div class="cat-card cat-china" onclick="goToArchive('1UkhvEC4JZr667rRjCMojkigCOeVpUd0N', 'นิยายจีน', 'china')">🐉 นิยายจีน</div>
+        <div class="cat-card cat-howto" onclick="goToArchive('1la3W0Rd0rpwV6SlcWfYjiU1FhqrPbuOL', 'เรื่องรัก (How-to)', 'classic')">💡 เรื่องรัก (How-to)</div>
+    </div>
+
+    <script>
+        function goToArchive(folderId, name, theme) {
+            // ส่งค่าไปยังหน้า smart-archive.html
+            const url = `smart-archive.html?folder=${folderId}&name=${encodeURIComponent(name)}&theme=${theme}`;
+            window.location.href = url;
+        }
+    </script>
+
+</body>
+</html>
