@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หนังสือจาก Drive ของฉัน - Reader App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; font-family: 'Prompt', sans-serif; }
+        body { margin: 0; padding: 0; background-color: #f4f7f6; text-align: center; }
+        .header { background: linear-gradient(135deg, #1d976c 0%, #93f9b9 100%); color: white; padding: 20px; font-size: 22px; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .container { padding: 40px 20px; max-width: 600px; margin: 0 auto; }
+        .btn-drive { background-color: #ffffff; color: #1d976c; border: 2px solid #1d976c; padding: 15px 30px; border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+        .btn-drive:hover { background-color: #1d976c; color: white; }
+        #file-info { margin-top: 30px; padding: 20px; background: white; border-radius: 15px; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .file-name { font-weight: 600; color: #333; font-size: 18px; margin-bottom: 15px; }
+        .btn-read-now { display: block; background: #764ba2; color: white; padding: 12px; border-radius: 10px; text-decoration: none; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">📂 คลังหนังสือใน Google Drive</div>
+
+    <div class="container">
+        <p>เลือกไฟล์ PDF หรือ EPUB จาก Google Drive ของคุณเพื่อเริ่มอ่าน</p>
+        
+        <button class="btn-drive" id="btn-select-file">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" width="25" alt="Drive">
+            เลือกไฟล์จาก Google Drive
+        </button>
+
+        <div id="file-info">
+            <div class="file-name" id="selected-file-name">ชื่อไฟล์จะปรากฏที่นี่</div>
+            <a href="#" id="read-link" class="btn-read-now" target="_blank">📖 เปิดอ่านไฟล์นี้</a>
+        </div>
+    </div>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <script>
+        // 🚨 ใส่ข้อมูลของคุณตรงนี้ 🚨
+        const API_KEY = 'AIzaSyCBOpYiLVCkxSbTvT1_CTIwBG8FoAbnJNY';
+        const CLIENT_ID = '287245430422-rdoqam818up4okrdo8qnak2p8ug716ir.apps.googleusercontent.com';
+
+        let accessToken = null;
+        let pickerApiLoaded = false;
+
+        // 1. โหลด Picker API
+        function loadPicker() {
+            gapi.load('picker', () => { pickerApiLoaded = true; });
+        }
+
+        // 2. ขอสิทธิ์เข้าถึง (Token)
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/drive.readonly',
+            callback: (response) => {
+                if (response.error !== undefined) throw response;
+                accessToken = response.access_token;
+                createPicker();
+            },
+        });
+
+        // 3. สร้างหน้าต่างเลือกไฟล์ (Picker)
+        function createPicker() {
+            if (pickerApiLoaded && accessToken) {
+                const view = new google.picker.DocsView(google.picker.ViewId.DOCS);
+                // กรองเฉพาะ PDF และ EPUB
+                view.setMimeTypes('application/pdf,application/epub+zip');
+                
+                const picker = new google.picker.PickerBuilder()
+                    .addView(view)
+                    .setOAuthToken(accessToken)
+                    .setDeveloperKey(API_KEY)
+                    .setCallback(pickerCallback)
+                    .build();
+                picker.setVisible(true);
+            }
+        }
+
+        // 4. เมื่อเลือกไฟล์เสร็จ
+        function pickerCallback(data) {
+            if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+                const doc = data[google.picker.Response.DOCUMENTS][0];
+                const fileName = doc[google.picker.Document.NAME];
+                const url = doc[google.picker.Document.URL];
+
+                document.getElementById('selected-file-name').innerText = "เลือกแล้ว: " + fileName;
+                document.getElementById('read-link').href = url;
+                document.getElementById('file-info').style.display = 'block';
+            }
+        }
+
+        document.getElementById('btn-select-file').addEventListener('click', () => {
+            if (!accessToken) {
+                tokenClient.requestAccessToken();
+            } else {
+                createPicker();
+            }
+        });
+
+        loadPicker();
+    </script>
+</body>
+</html>
